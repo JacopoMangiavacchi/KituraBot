@@ -17,7 +17,7 @@ Usage:
     //2. Add specific channel to the KituraBot instance
     do {
         //2.1 Add Facebook Messenger channel
-        try bot.addChannel(channelName: "FacebookEcho", channel: KituraBotFacebookMessenger(appSecret: Configuration.appSecret, validationToken: Configuration.validationToken, pageAccessToken: Configuration.pageAccessToken, webHookPath: "/webhook"))
+        try bot.addChannel(channelName: "FacebookEcho", channel: KituraBotFacebookMessenger(appSecret: "...", validationToken: "...", pageAccessToken: "...", webHookPath: "/webhook"))
     } catch is KituraBotError {
         Log.error("Oops... something wrong on Bot Channel name")
     }
