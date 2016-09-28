@@ -3,6 +3,9 @@ Swift, Kitura based, declarative multi-channel BOT framework
 
 Implement KituraBot multi-channel Class and define KituraBotProtocol for implementing KituraBot channel specific templates.
 
+KituraBotFacebookMessenger is the first KituraBot plugin available for supporting Chat Bot on the Facebook Messenger channel. (https://github.com/JacopoMangiavacchi/KituraBotFacebookMessenger)
+
+
 Usage:
 
     //1. Instanciate KituraBot and implement BOT logic
