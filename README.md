@@ -17,7 +17,48 @@ KituraBot architecture allows to plugin several channels on the same Kitura app 
 
 See the KituraBotFrontendEchoSample project for how to implement a simple Echo Bot woth this framework (https://github.com/JacopoMangiavacchi/KituraBotFrontendEchoSample)
 
-## Usage
+## API for the Kitura Bot implementation
+
+    /// Initialize a `KituraBot` instance.
+    /// - Parameter router: Passed Kitura Router (to add GET and POST REST API for the webhook URI path.
+    public init(router: Router, botMessageNotificationHandler: @escaping (SyncNotificationHandler))
+
+    /// Notification Handler passed through the initalization method to get notification of coming BOT requests
+    /// from all channels implemented according to the KituraBotProtocol and plugged in to the KituraBot instance.
+    public typealias SyncNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String) -> String?
+
+    /// Method to call to add a KituraBotProtocol compliant plugin such as KituraBotFacebookMessenger.
+    public func addChannel(channelName: String, channel: KituraBotProtocol)
+    
+    /// Method for enabling the Bot asyncronous logic and for implementig the handler to manage
+    /// how to send back (push) a message to the client.
+    public func exposeAsyncPush(securityToken: String, webHookPath: String = "/BotPushBack", pushNotificationHandler: @escaping (PushNotificationHandler))
+        
+    /// Notification Handler passed through the exposeAsyncPush method to get notification from the backend async BOT logic (i.e. OpenWhisk)
+    /// for sending back a message to the user.
+    /// It allows to send back the message on the original channel or to eventually change channel and even message
+    public typealias PushNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String) -> (channelName: String, message: String)?
+    
+
+## REST API for the Async backend Bot implementation (aka OpenWhisk)
+
+Calling the exposeAsyncPush method expose a POST REST API on the webHookPath passed as paramenter.
+    
+This POST REST API allows a backend implementing an asyncronous Bot logic (i.e. running on IBM OpenWhisk) to callback the KituraBot frontend to send back to the caller a response message or eventually even to initialize with the client a new conversation.
+    
+The passed securityToken parameter could be configured to allow a simple security level for this API.  More stronger security could be implemented with infrastructure service (for example configuring IP filtering and allows calls coming only from specific backend).
+
+The following is the JSON payload for this POST REST API:
+
+    {
+        "channel" : "xxx",
+        "recipientId" : "xxx",
+        "messageText" : "xxx",
+        "securityToken" : "xxx"
+    }
+
+
+## Example Usage
 
     //1. Instanciate KituraBot and implement BOT logic
     let bot = KituraBot(router: router) { (channelName: String, senderId: String, message: String) -> String? in
