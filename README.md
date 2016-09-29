@@ -7,6 +7,7 @@ Implement KituraBot multi-channel Class and define KituraBotProtocol for impleme
 
 KituraBotFacebookMessenger is the first KituraBot plugin available for supporting Chat Bot on the Facebook Messenger channel. (https://github.com/JacopoMangiavacchi/KituraBotFacebookMessenger)
 
+See the KituraBotFrontendEchoSample project for how to implement a simple Echo Bot woth this framework (https://github.com/JacopoMangiavacchi/KituraBotFrontendEchoSample)
 
 ## Usage
 
