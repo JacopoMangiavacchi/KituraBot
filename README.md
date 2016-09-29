@@ -21,7 +21,7 @@ See the KituraBotFrontendEchoSample project for how to implement a simple Echo B
 ## API for the Kitura Bot implementation
 
     /// Initialize a `KituraBot` instance.
-    /// - Parameter router: Passed Kitura Router (to add GET and POST REST API for the webhook URI path.
+    /// - Parameter router: Passed Kitura Router (to add GET and POST REST API for the webhook URI path of the plugged in channels).
     public init(router: Router, botMessageNotificationHandler: @escaping (SyncNotificationHandler))
 
     /// Notification Handler passed through the initalization method to get notification of coming BOT requests
