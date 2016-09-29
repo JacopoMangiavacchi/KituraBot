@@ -7,7 +7,7 @@ KituraBot Swift Package implements KituraBot multi-channel Class and define Kitu
 
 It support both a traditional syncronous model as well as a full asyncronous model.
 
-In the traditional syncronous model the Bot respond immediatly in the context of the caller HTTP request webhook.
+In the traditional syncronous model the Bot respond immediatly in the context of the caller webhook HTTP request.
 
 In the async model the webhook could call an event driven system such as IBM OpenWhisk to strongly decoupling the Bot implementation logic and implement a "Long Running Conversation" model.
 
