@@ -5,7 +5,15 @@ Swift, Kitura based, declarative multi-channel BOT framework
 
 Implement KituraBot multi-channel Class and define KituraBotProtocol for implementing KituraBot channel specific templates.
 
+It support both a traditional syncronous model as well as a full asyncronous model.
+
+In the traditional syncronous model the Bot respond immediatly in the context of the caller HTTP request webhook.
+
+In the async model the webhook could call an event driven system such as IBM OpenWhisk to strongly decoupling the Bot implementation logic and implement a "Long Running Conversation" model.
+
 KituraBotFacebookMessenger is the first KituraBot plugin available for supporting Chat Bot on the Facebook Messenger channel. (https://github.com/JacopoMangiavacchi/KituraBotFacebookMessenger)
+
+KituraBot architecture allows to plugin several channels on the same Kitura app implementing in a unique and central way the same Bot logic for different channels.
 
 See the KituraBotFrontendEchoSample project for how to implement a simple Echo Bot woth this framework (https://github.com/JacopoMangiavacchi/KituraBotFrontendEchoSample)
 
