@@ -3,7 +3,7 @@ Swift, Kitura based, declarative multi-channel BOT framework
 
 **Warning: This is work in progress**
 
-Implement KituraBot multi-channel Class and define KituraBotProtocol for implementing KituraBot channel specific templates.
+KituraBot Swift Package implements KituraBot multi-channel Class and define KituraBotProtocol for implementing KituraBot channel specific templates.
 
 It support both a traditional syncronous model as well as a full asyncronous model.
 
