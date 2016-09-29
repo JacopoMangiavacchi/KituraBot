@@ -103,7 +103,7 @@ The following is the JSON payload for this POST REST API:
     }
             
             
-    ///3.b [Optional] Activate Async Push Back cross channel functionality
+    ///3.b Activate Async Push Back cross channel functionality
     bot.exposeAsyncPush(securityToken: Configuration.pushApiSecurityToken, webHookPath: "/botPushApi") { (channelName: String, senderId: String, message: String) -> (channelName: String, message: String)? in
         //The implementation of exposePushBack method in KituraBot class will automatically expose REST interface to be called by the Async logic (i.e. KituraBotPushAction)
         
