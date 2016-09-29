@@ -61,7 +61,7 @@ The following is the JSON payload for this POST REST API:
 
 
 
-## Example Usage
+## Example Usage: A simple Echo Bot exposed over Facebook Messenger channel in both Syncronous and Asyncronous way
 
     //1. Instanciate KituraBot and implement BOT logic
     let bot = KituraBot(router: router) { (channelName: String, senderId: String, message: String) -> String? in
