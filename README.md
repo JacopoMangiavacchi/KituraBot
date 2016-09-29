@@ -17,6 +17,7 @@ KituraBot architecture allows to plugin several channels on the same Kitura app 
 
 See the KituraBotFrontendEchoSample project for how to implement a simple Echo Bot woth this framework (https://github.com/JacopoMangiavacchi/KituraBotFrontendEchoSample)
 
+
 ## API for the Kitura Bot implementation
 
     /// Initialize a `KituraBot` instance.
@@ -40,6 +41,7 @@ See the KituraBotFrontendEchoSample project for how to implement a simple Echo B
     public typealias PushNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String) -> (channelName: String, message: String)?
     
 
+
 ## REST API for the Async backend Bot implementation (aka OpenWhisk)
 
 Calling the exposeAsyncPush method expose a POST REST API on the webHookPath passed as paramenter.
@@ -56,6 +58,7 @@ The following is the JSON payload for this POST REST API:
         "messageText" : "xxx",
         "securityToken" : "xxx"
     }
+
 
 
 ## Example Usage
