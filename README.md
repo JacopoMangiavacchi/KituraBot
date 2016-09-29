@@ -85,7 +85,7 @@ The following is the JSON payload for this POST REST API:
     }
 
 
-## A simple Asyncronous Echo Bot exposed over multiple channels and with Bot logic implemented on OpenWhisk
+## An Asyncronous Bot exposed over multiple channels and with Bot logic implemented on OpenWhisk
 
     //1. Instanciate KituraBot and implement BOT logic
     let bot = KituraBot(router: router) { (channelName: String, senderId: String, message: String) -> String? in
