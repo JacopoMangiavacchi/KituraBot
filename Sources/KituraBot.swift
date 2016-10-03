@@ -12,11 +12,12 @@ import SwiftyJSON
 import LoggerAPI
 
 
-public typealias BotInternalMessageNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String) -> Void
+//Return back to the channel the Sync Response Message eventually returned by the caller bot logic
+public typealias BotInternalMessageNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String, _ context: [String: Any]?) -> (message: String, context:[String: Any]?)?
 
 public protocol KituraBotProtocol {
     func configure(router: Router, channelName: String, botProtocolMessageNotificationHandler: @escaping BotInternalMessageNotificationHandler)
-    func sendTextMessage(recipientId: String, messageText: String)
+    func sendTextMessage(recipientId: String, messageText: String, context: [String: Any]?)
 }
 
 public enum KituraBotError: Error {
@@ -32,9 +33,9 @@ public class KituraBot {
     private struct KituraChannel {
         let channel: KituraBotProtocol
     }
-    
-    public typealias SyncNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String) -> String?
-    public typealias PushNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String) -> (channelName: String, message: String)?
+
+    public typealias SyncNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String, _ context: [String: Any]?) -> (message: String, context: [String: Any]?)?
+    public typealias PushNotificationHandler = (_ channelName: String, _ senderId: String, _ message: String, _ context: [String: Any]?) -> (channelName: String, message: String, context: [String: Any]?)?
     
     private let syncBotMessageNotificationHandler: SyncNotificationHandler
     private var pushBotMessageNotificationHandler: PushNotificationHandler?
@@ -61,12 +62,9 @@ public class KituraBot {
         channelDictionary[channelName] = KituraChannel(channel: channel)
     }
     
-    private func internalBotProtocolMessageNotificationHandler(_ channelName: String, _ senderId: String, _ message: String)  {
-        if let responseMessage = syncBotMessageNotificationHandler(channelName, senderId, message) {
-            if let channel = channelDictionary[channelName]?.channel {
-                channel.sendTextMessage(recipientId: senderId, messageText: responseMessage)
-            }
-        }
+    // Return to the caller the optionl Syncronous Response Message returned by the caller bot logic
+    private func internalBotProtocolMessageNotificationHandler(_ channelName: String, _ senderId: String, _ message: String, _ context: [String: Any]?) -> (message: String, context: [String: Any]?)? {
+        return syncBotMessageNotificationHandler(channelName, senderId, message, context)
     }
     
     public func exposeAsyncPush(securityToken: String, webHookPath: String = "/BotPushBack", pushNotificationHandler: @escaping (PushNotificationHandler)) {
@@ -80,6 +78,16 @@ public class KituraBot {
     
     /// Exposed API to Send Message to the Bot client.
     /// Used for Asyncronous Bot notifications.
+    ///
+    /// JSON Payload
+    /// {
+    ///     "channel" : "xxx",
+    ///     "recipientId" : "xxx",
+    ///     "messageText" : "xxx",
+    ///     "securityToken" : "xxx"
+    ///     "context" : {}
+    /// }
+    
     private func sendMessageHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
         print("POST - send message")
         Log.debug("POST - send message")
@@ -92,15 +100,18 @@ public class KituraBot {
                     var finalChannelName = channelName
                     var finalMessage = messageText
                     
+                    var context = json["context"].dictionaryObject
+                    
                     //Call pushBotMessageNotificationHandler to verify channel and message
-                    if let (newChannelName, newMessage) = pushBotMessageNotificationHandler?(channelName, recipientId, messageText) {
+                    if let (newChannelName, newMessage, newContext) = pushBotMessageNotificationHandler?(channelName, recipientId, messageText, context) {
                         finalChannelName = newChannelName
                         finalMessage = newMessage
+                        context = newContext
                     }
                     
                     //SEND MESSAGE TO THE channel
                     if let channel = channelDictionary[finalChannelName]?.channel {
-                        channel.sendTextMessage(recipientId: recipientId, messageText: finalMessage)
+                        channel.sendTextMessage(recipientId: recipientId, messageText: finalMessage, context: context)
                     }
                     
                     try response.status(.OK).end()
