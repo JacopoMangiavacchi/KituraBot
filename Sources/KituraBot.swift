@@ -40,7 +40,7 @@ public struct KituraBotMessage {
     public let messageType: KituraBotMessageType
     public let user: KituraBotUser
     public let messageText: String
-    public let context: KituraBotContext?
+    public var context: KituraBotContext?
     
     //TODO: Add default
     public init(messageType: KituraBotMessageType, user: KituraBotUser, messageText: String, context: KituraBotContext?) {
@@ -59,10 +59,12 @@ public struct KituraBotMessage {
 public protocol KituraBotMessageStoreProtocol {
     func addMessage(_ message: KituraBotMessage)
     func getMessage(messageId: String) -> KituraBotMessage?
-    //TODO: Pass KituraBotUser (channel + userid)
+    func getLastMessageForUser(_ user: KituraBotUser) -> KituraBotMessage?
+    
     func getMessageAll(user: KituraBotUser) -> [KituraBotMessage]
     func getMessageAll(fromMessageId: String, user: KituraBotUser) -> [KituraBotMessage]
     func getMessageAll(fromDate: String, user: KituraBotUser) -> [KituraBotMessage]
+    func resetLastMessageForUser(_ user: KituraBotUser)
 }
 
 
@@ -134,6 +136,7 @@ public class KituraBot {
         router.get("\(getPath)/channel/:channelId/user/:userId/token/:tokenId", handler: getMessageAllHandler)
         router.get("\(getPath)/channel/:channelId/user/:userId/fromId/:fromId/token/:tokenId", handler: getMessagesFromIdHandler)
         router.get("\(getPath)/channel/:channelId/user/:userId/fromDate/:fromDate/token/:tokenId", handler: getMessagesFromDateHandler)
+        router.get("\(getPath)/channel/:channelId/user/:userId/reset/token/:tokenId", handler: resetMessagesForUserHandler)
     }
     
     public func addChannel(channelName: String, channel: KituraBotProtocol) throws {
@@ -148,13 +151,21 @@ public class KituraBot {
     
     // Return to the caller the optionl Syncronous Response Message returned by the caller bot logic
     private func internalBotProtocolMessageNotificationHandler(_ message: KituraBotMessage) -> KituraBotMessageResponse? {
+        var messageReceived = message
+        
+        //Check if received message from channel doesn't have context and eventually
+        if messageReceived.context == nil {
+            if let lastMessage = messageStore?.getLastMessageForUser(messageReceived.user) {
+                messageReceived.context = lastMessage.context
+            }
+        }
         
         //Save the message received on Message Store
-        messageStore?.addMessage(message)
+        messageStore?.addMessage(messageReceived)
         
-        if let messageToReturn = syncBotMessageNotificationHandler(message) {
+        if let messageToReturn = syncBotMessageNotificationHandler(messageReceived) {
             //Save the message to sand back on Message Store
-            let messageReturned = KituraBotMessage(messageType: .response, user: message.user, messageText: messageToReturn.messageText, context: messageToReturn.context)
+            let messageReturned = KituraBotMessage(messageType: .response, user: messageReceived.user, messageText: messageToReturn.messageText, context: messageToReturn.context)
             
             messageStore?.addMessage(messageReturned)
             
@@ -373,6 +384,28 @@ public class KituraBot {
         
         try response.status(.badRequest).end()
     }
+    
+    
+    /// Exposed API to Reset last message per user
+    /// "\(getPath)/channel/:channelId/user/:userId/reset/token/:tokenId"
+    /// i.e. http://localhost:8090/message/channel/channel1/user/123/fromId/123/token/1234
+    private func resetMessagesForUserHandler(request: RouterRequest, response: RouterResponse, next: @escaping () -> Void) throws {
+        guard let token = request.parameters["tokenId"], token == getToken else {
+            Log.debug("Passed GET token do not match")
+            print("Passed GET token do not match")
+            
+            try response.status(.badRequest).end()
+            return
+        }
+        
+        if let userId = request.parameters["userId"], let channelName = request.parameters["channelId"] {
+            let user = KituraBotUser(userId: userId, channel: channelName)
+
+            messageStore?.resetLastMessageForUser(user)
+            try response.status(.OK).end()
+            return
+        }
+        
+        try response.status(.badRequest).end()
+    }
 }
-
-
