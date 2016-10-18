@@ -17,13 +17,8 @@ public typealias KituraBotContext = [String: Any]
 //KituraBot User structure
 //A user id is unique per channel
 public struct KituraBotUser {
-    public let userId: String
-    public let channel: String
-    
-    public init(userId: String, channel: String) {
-        self.userId = userId
-        self.channel = channel
-    }
+    let userId: String
+    let channel: String
 }
 
 
@@ -35,15 +30,15 @@ public enum KituraBotMessageType : Int {
 
 //KituraBot Message structure
 public struct KituraBotMessage {
-    public let messageId: String
-    public let timestamp: Date
-    public let messageType: KituraBotMessageType
-    public let user: KituraBotUser
-    public let messageText: String
-    public var context: KituraBotContext?
+    let messageId: String
+    let timestamp: Date
+    let messageType: KituraBotMessageType
+    let user: KituraBotUser
+    let messageText: String
+    var context: KituraBotContext?
     
     //TODO: Add default
-    public init(messageType: KituraBotMessageType, user: KituraBotUser, messageText: String, context: KituraBotContext?) {
+    init(messageType: KituraBotMessageType, user: KituraBotUser, messageText: String, context: KituraBotContext?) {
         self.messageId = UUID().uuidString
         self.timestamp = Date()
         
@@ -70,13 +65,8 @@ public protocol KituraBotMessageStoreProtocol {
 
 //KituraBot Message Response structure
 public struct KituraBotMessageResponse {
-    public let messageText: String
-    public let context:KituraBotContext?
-    
-    public init(messageText: String, context:KituraBotContext?) {
-        self.messageText = messageText
-        self.context = context
-    }
+    let messageText: String
+    let context:KituraBotContext?
 }
 
 
